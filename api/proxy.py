@@ -145,7 +145,7 @@ class handler(BaseHTTPRequestHandler):
         
         print("INFO: Filling password...")
         password_input.fill(password)
-        popup.get_by_role("button", name="Sign In").click()
+        popup.get_by_role("button", name="Sign in").click()
         print("INFO: 'Sign In' button clicked.")
 
         # Ждем, пока popup закроется сам после успешного входа
