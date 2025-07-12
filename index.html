@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime AI Proxy</title>
+    <link rel="stylesheet" href="/public/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="glass-container">
+        <h1>Мой AI Ассистент</h1>
+        <p>Задайте любой вопрос, и я получу ответ через прокси к Puter AI.</p>
+        
+        <textarea id="prompt-input" placeholder="Например: Почему небо голубое?"></textarea>
+        <button id="submit-button">Отправить</button>
+        
+        <div class="result-box">
+            <pre id="result-output"></pre>
+        </div>
+    </main>
+
+    <script>
+        const promptInput = document.getElementById('prompt-input');
+        const submitButton = document.getElementById('submit-button');
+        const resultOutput = document.getElementById('result-output');
+
+        submitButton.addEventListener('click', async () => {
+            const prompt = promptInput.value;
+            if (!prompt) {
+                resultOutput.textContent = 'Пожалуйста, введите вопрос.';
+                return;
+            }
+
+            // Показываем состояние загрузки
+            submitButton.disabled = true;
+            submitButton.textContent = 'Думаю...';
+            resultOutput.textContent = 'Отправляю запрос на сервер... Это может занять до 20 секунд.';
+
+            try {
+                const response = await fetch('/api/proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Ошибка сервера: ${response.status}`);
+                }
+
+                const data = await response.json();
+                resultOutput.textContent = data.response;
+
+            } catch (error) {
+                resultOutput.textContent = `Произошла ошибка: ${error.message}`;
+            } finally {
+                // Возвращаем кнопку в исходное состояние
+                submitButton.disabled = false;
+                submitButton.textContent = 'Отправить';
+            }
+        });
+    </script>
+</body>
+</html>
